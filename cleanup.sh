@@ -24,7 +24,7 @@
 #
 
 set -f
-declare -rx VERSION="1.0"
+declare -rx VERSION="1.0@dev"
 
 ###################### flags enabled by script options
 export VERBOSE=false

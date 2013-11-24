@@ -8,8 +8,10 @@ and to clean up OS files on a working directory.
 
     cleanup.sh  [-h | --help | help]  [-i | --usage | usage]
           [-x | --dry-run]  [-v | --verbose]  [-q | --quiet]
-          [-d | --chmod-dirs =CHMOD]  [-f | --chmod-files =CHMOD]  [-a | --chmod-secret =CHMOD]  [-b | --chmod-bins =CHMOD]
-          [-s | --shells =MASKS LIST]  [-z | --bin =BIN DIRS LIST]  [-m | --mask =MASKS LIST]  [-k | --keys =MASKS LIST]
+          [-d | --chmod-dirs =CHMOD]  [-f | --chmod-files =CHMOD]
+          [-a | --chmod-secret =CHMOD]  [-b | --chmod-bins =CHMOD]
+          [-s | --shells =MASKS LIST]  [-z | --bin =BIN DIRS LIST]
+          [-m | --mask =MASKS LIST]  [-k | --keys =MASKS LIST]
 
 To begin, run:
 
