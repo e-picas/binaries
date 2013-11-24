@@ -20,6 +20,8 @@
 # Error messages are followed by throwing line number.
 #
 
+declare -rx VERSION="1.0"
+
 ###################### flags enabled by script options
 export _DEBUG=false
 export _VERBOSE=false
@@ -103,7 +105,7 @@ fi
 #### usage ()
 usage () {
     echo "    $0  [--dry-run]  [--test]  [--clean]  [--server-clean]"
-    echo "          [-x | --debug | debug]  [-h | --help | help]  [-i | --usage | usage]"
+    echo "          [-x | --debug | debug]  [-h | --help | help]  [-i | --usage | usage]  [-V]"
     echo "          local_name  [svn_name=local_name]  [git_name=local_name]  [type=none]  [backup_dirnames=dirA,dirB]  [pre-server-hook]"
 }
 
@@ -131,6 +133,7 @@ help () {
     echo "    --debug | -x     Debug current environment (nothing is done)"
     echo "    --usage | -i     Show simple usage info"
     echo "    --help | -h      Show this help info"
+    echo "    -V               Get script version"
     echo
     echo "infos:"
     echo "    All arguments are optional except the 'local_name'. Use the dash value '-' to use default for an argument."
@@ -429,6 +432,10 @@ fi
 SCRIPTOPTS=""
 for var in "$@"; do
     case "$var" in
+        -V)
+            echo "$VERSION"
+            exit 0
+            ;;
         debug|--debug|-x)
             export _DEBUG=true; shift
             ;;
