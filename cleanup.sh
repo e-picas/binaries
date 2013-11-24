@@ -6,6 +6,7 @@
 
 # Options:
 #
+# V version
 # h help
 # i info usage
 # v verbose
@@ -23,6 +24,7 @@
 #
 
 set -f
+declare -rx VERSION="1.0"
 
 ###################### flags enabled by script options
 export VERBOSE=false
@@ -62,7 +64,7 @@ if [ ! -n "$SECRET_CHMOD" ]; then export SECRET_CHMOD="${DEFAULT_SECRET_CHMOD}";
 #### usage ()
 usage () {
     echo "    $0  [-h | --help | help]  [-i | --usage | usage]"
-    echo "          [-x | --dry-run]  [-v | --verbose]  [-q | --quiet]"
+    echo "          [-x | --dry-run]  [-v | --verbose]  [-q | --quiet]  [-V]"
     echo "          [-d | --chmod-dirs =CHMOD]  [-f | --chmod-files =CHMOD]  [-a | --chmod-secret =CHMOD]  [-b | --chmod-bins =CHMOD]"
     echo "          [-s | --shells =MASKS LIST]  [-z | --bin =BIN DIRS LIST]  [-m | --mask =MASKS LIST]  [-k | --keys =MASKS LIST]"
 }
@@ -283,7 +285,7 @@ if [ -n "$1" ]; then
 fi
 
 OPTIND=1
-while getopts "a:b:d:f:him:q:s:vw:xz:-:" OPTION; do
+while getopts "a:b:d:f:him:q:s:Vvw:xz:-:" OPTION; do
     OPTARG="${OPTARG#=}"
     case $OPTION in
     # common options
@@ -297,6 +299,7 @@ while getopts "a:b:d:f:him:q:s:vw:xz:-:" OPTION; do
         q) export VERBOSE=false; export QUIET=true;;
         s) export SCRIPT_MASKS=( $(getSafeList DEFAULT_SCRIPT_MASKS[@] "${OPTARG}") );;
         v) export VERBOSE=true; export QUIET=false;;
+        V) echo "$VERSION"; exit 0;;
         w) export WORKING_DIR="$OPTARG";;
         x) export DRYRUN=true;;
         z) export SCRIPT_DIRS=( $(getSafeList DEFAULT_SCRIPT_DIRS[@] "${OPTARG}") );;
