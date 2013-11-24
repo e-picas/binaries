@@ -1,0 +1,25 @@
+### Hack to allow keeping an empty directory
+!.gitkeep
+
+### OS & software files
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+Icon
+._*
+*~
+*~lock*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# IDE files
+# to be commented to include them in a project
+.project
+.buildpath
+.idea/*
+
+# any "tmp*" file or dir anywhere
+*tmp*
