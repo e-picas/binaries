@@ -10,7 +10,8 @@ For the original `git-svn` manual, see <http://git-scm.com/docs/git-svn>.
 
     svn-to-git.sh  [--dry-run]  [--test]  [--clean]  [--server-clean]
           [-x | --debug | debug]  [-h | --help | help]  [-i | --usage | usage]
-          local_name  [svn_name=local_name]  [git_name=local_name]  [type=none]  [backup_dirnames=dirA,dirB]  [pre-server-hook]
+          local_name  [svn_name=local_name]  [git_name=local_name]  [type=none]
+          [backup_dirnames=dirA,dirB]  [pre-server-hook]
 
 To begin, run:
 
