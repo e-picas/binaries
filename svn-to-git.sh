@@ -20,7 +20,7 @@
 # Error messages are followed by throwing line number.
 #
 
-declare -rx VERSION="1.0"
+declare -rx VERSION="1.0@dev"
 
 ###################### flags enabled by script options
 export _DEBUG=false
