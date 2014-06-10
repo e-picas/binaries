@@ -21,4 +21,4 @@ To begin, run:
 
 Copyright (c) 2013, Piero Wbmstr - All rights reserved. See LICENSE file for infos.
 
-<http://github.com/pierowbmstr/cleanup>
+<http://github.com/piwi/cleanup>

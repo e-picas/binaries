@@ -2,7 +2,7 @@
 #
 # Copyright (c) 2013, Piero Wbmstr
 # All rights reserved. See LICENSE file for infos.
-# <http://github.com/pierowbmstr/svn-to-git>
+# <http://github.com/piwi/svn-to-git>
 
 # Options:
 #
