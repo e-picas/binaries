@@ -1,0 +1,36 @@
+#
+# .gitignore
+# <http://github.com/piwi/binaries.git>
+#
+
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+Icon
+._*
+*~
+*~lock*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+nbproject
+.cache
+.settings
+.project
+.buildpath
+.idea
+.tmproj
+*.esproj
+*.sublime-project
+*.sublime-workspace
+*.diff
+*.err
+*.orig
+*.log
+*.rej
+*.swo
+*.swp
+*.zip
+*.vi
