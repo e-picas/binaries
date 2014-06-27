@@ -1,7 +1,7 @@
 #!/bin/bash
 
 export GIT_USER_NAME="Piero Wbmstr"
-export GIT_USER_EMAIL="piwi@ateliers-pierrot.fr"
+export GIT_USER_EMAIL="me@e-piwi.fr"
 export SVNURL="file:///opt/local/www/repositories/"
 export SVNROOT="svn/"
 export GITURL="/opt/local/www/"
