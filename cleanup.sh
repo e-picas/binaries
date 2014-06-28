@@ -5,7 +5,8 @@
 # <http://github.com/piwi/binaires.git>
 # (personal) file licensed under CC BY-NC-SA 4.0 <http://creativecommons.org/licenses/by-nc-sa/4.0/>
 #
-# Cleanup a directory contents
+# A simple shell utility to fix UNIX rights on files, directories, secret files and binaries
+# and to clean up OS files on a working directory.
 #
 
 # Options:
