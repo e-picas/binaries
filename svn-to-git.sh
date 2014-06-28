@@ -5,7 +5,12 @@
 # <http://github.com/piwi/binaires.git>
 # (personal) file licensed under CC BY-NC-SA 4.0 <http://creativecommons.org/licenses/by-nc-sa/4.0/>
 #
-# SVN to GIT tool
+# A SVN to GIT utility using internal `git-svn`, retrieving *branches* and *tags* and
+# cleaning the new GIT clone before to push it on a distant remote.
+# 
+# For the original `git-svn` manual, see <http://git-scm.com/docs/git-svn>.
+#
+# See <https://github.com/piwi/binaries/tree/svn-to-git-work> for process info
 #
 
 # Usage:
@@ -22,8 +27,6 @@
 #    export MSG_GITFILTER="my personal value" && svn-to-git.sh ...
 #
 # Error messages are followed by throwing line number.
-#
-# See <https://github.com/piwi/binaries/tree/svn-to-git-work> for process info
 #
 
 declare -rx VERSION="1.0@dev"
