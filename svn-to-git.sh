@@ -1,8 +1,12 @@
 #!/bin/bash
 #
-# Copyright (c) 2013, Piero Wbmstr
-# All rights reserved. See LICENSE file for infos.
-# <http://github.com/piwi/svn-to-git>
+# svn-to-git.sh
+# by @pierowbmstr (me at e-piwi dot fr)
+# <http://github.com/piwi/binaires.git>
+# (personal) file licensed under CC BY-NC-SA 4.0 <http://creativecommons.org/licenses/by-nc-sa/4.0/>
+#
+# SVN to GIT tool
+#
 
 # Usage:
 #
@@ -18,6 +22,8 @@
 #    export MSG_GITFILTER="my personal value" && svn-to-git.sh ...
 #
 # Error messages are followed by throwing line number.
+#
+# See <https://github.com/piwi/binaries/tree/svn-to-git-work> for process info
 #
 
 declare -rx VERSION="1.0@dev"

@@ -133,6 +133,7 @@ SERVER
 
 ## License
 
-Copyright (c) 2013, Piero Wbmstr - All rights reserved. See LICENSE file for infos.
+Copyright (c) 2013, Piero Wbmstr - All rights reserved.
+License CC BY-NC-SA 4.0 http://creativecommons.org/licenses/by-nc-sa/4.0/
 
-<http://github.com/piwi/svn-to-git>
+<http://github.com/piwi/binaries>
