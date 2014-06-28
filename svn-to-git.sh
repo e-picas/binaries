@@ -1,8 +1,17 @@
 #!/bin/bash
 #
-# Copyright (c) 2013, Piero Wbmstr
-# All rights reserved. See LICENSE file for infos.
-# <http://github.com/piwi/svn-to-git>
+# svn-to-git.sh
+# by @pierowbmstr (me at e-piwi dot fr)
+# <http://github.com/piwi/binaires.git>
+# (personal) file licensed under CC BY-NC-SA 4.0 <http://creativecommons.org/licenses/by-nc-sa/4.0/>
+#
+# A SVN to GIT utility using internal `git-svn`, retrieving *branches* and *tags* and
+# cleaning the new GIT clone before to push it on a distant remote.
+# 
+# For the original `git-svn` manual, see <http://git-scm.com/docs/git-svn>.
+#
+# See <https://github.com/piwi/binaries/tree/svn-to-git-work> for process info
+#
 
 # Usage:
 #
