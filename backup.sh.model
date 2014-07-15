@@ -1,40 +1,41 @@
 #!/bin/bash
 #
-# bockup.sh.model
+# backup.sh.model
 # by @pierowbmstr (me at e-piwi dot fr)
 # <http://github.com/piwi/binaires.git>
 # (personal) file licensed under CC BY-NC-SA 4.0 <http://creativecommons.org/licenses/by-nc-sa/4.0/>
 #
-# Some backup utilities for distant mysql databases and server
+# Some backup utilities for backups of mysql databases and distant servers
+# Variables to be filled are written like `|NAME|`
 #
+
+# this should be defined in `.bashrc`
+[ -z $BACKUPDIR ] && BACKUPDIR="${HOME}/backups";
+[ ! -d $BACKUPDIR ] && mkdir -p "${BACKUPDIR}";
 
 # vars
 _DATE=$(date +%d-%m-%Y)
-[ -z $BACKUPDIR ] && BACKUPDIR="${HOME}/backups";
-_SERVER_ROOT="@SERVER_ROOT@"
 _LOG_FILE="${BACKUPDIR}/history"
 
-# create backup dir if so
-[ ! -d $BACKUPDIR ] && mkdir -p "${BACKUPDIR}";
-
-# database
-mysqldump \
+# database dump
+$(mysqldump \
     --add-drop-table --dump-date \
-    --host=@HOST@ --user=@USER@ --password=@PASS@ \
-    @DB_NAME@ | gzip -c > "${BACKUPDIR}/@DB_NAME@-${_DATE}.sql.gz" &> $_LOG_FILE;
+    --host=|HOST| --user=|USER| --password=|PASS| \
+    |DB_NAME| | gzip -c > "${BACKUPDIR}/|DB_NAME|-${_DATE}.sql.gz") &> $_LOG_FILE;
 
-# www contents
-cd "${_SERVER_ROOT}@DIR@" && tar --atime-preserve --exclude="*/tmp/*" -czf "${BACKUPDIR}/www-@DIR@.tar.gz" "./@DIR@"  &> $_LOG_FILE;
+# www contents ; to be executed on the server
+_SERVER_ROOT="|SERVER_ROOT|"
+cd "${_SERVER_ROOT}|DIR|" && tar --atime-preserve --exclude="*/tmp/*" -czf "${BACKUPDIR}/www-|DIR|.tar.gz" "./|DIR|"  &> $_LOG_FILE;
 
 # backuping contents from a <free.fr> server
 # @see http://voidandany.free.fr/index.php/sauvegarder-un-site-internet-blog-heberge-chez-free-fr-avec-rsnaphot/
-mkdir -p "${BACKUPDIR}/@SERVER@"
-cd "${BACKUPDIR}/@SERVER@" && wget -nvc -a $_LOG_FILE -t 0 -r "ftp://@USER@:@PASS@@@SERVER@/";
-cd "${BACKUPDIR}/@SERVER@" && wget -nv -a $_LOG_FILE http://sql.free.fr/backup.php --post-data="login=@USER@&password=@PASS@&check=1&all=1" -O "${BACKUPDIR}/@USER@-${_DATE}.sql.gz";
+mkdir -p "${BACKUPDIR}/|SERVER|"
+cd "${BACKUPDIR}/|SERVER|" && wget -nvc -a $_LOG_FILE -t 0 -r "ftp://|USER|:|PASS|@|SERVER|/";
+cd "${BACKUPDIR}/|SERVER|" && wget -nv -a $_LOG_FILE http://sql.free.fr/backup.php --post-data="login=|USER|&password=|PASS|&check=1&all=1" -O "${BACKUPDIR}/|USER|-${_DATE}.sql.gz";
 
 # full cloning
-[ ! -d $BACKUPDIR/server_clone ] && mkdir -p "${BACKUPDIR}/server_clone";
-rsync -avrlzh "@USER@"@"@SERVER@":~/@DIR@ "${BACKUPDIR}/server_clone/" &> $_LOG_FILE;
+[ ! -d $BACKUPDIR/|SERVER|-clone ] && mkdir -p "${BACKUPDIR}/|SERVER|-clone";
+rsync -avrlzh |USER|@|SERVER|:~/|DIR| "${BACKUPDIR}/|SERVER|-clone/" &> $_LOG_FILE;
 
 # in case of a local backup on the server: synch backups locally and remove them from the server
 rsync --remove-source-files -avrlzh |USER|@|SERVER|:~/backups/* ${BACKUPDIR}/ \
