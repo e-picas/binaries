@@ -1,0 +1,20 @@
+<!--
+
+Tries to open GOTO_URL in user's default browser
+
+Run:
+
+    xdg-open file.goto.html
+    # or
+    open file.goto.html
+
+-->
+<script>
+
+// the URL to open
+GOTO_URL = 'http://www.allocine.fr/film/fichefilm_gen_cfilm=177769.html';
+
+document.write('You should be automatically redirected to: <a href="'+GOTO_URL+'">'+GOTO_URL+'</a> ...');
+window.location.href = GOTO_URL;
+</script>
+

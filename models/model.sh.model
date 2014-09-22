@@ -1,0 +1,43 @@
+#!/bin/bash
+
+#######################################################################
+# script infos
+VERSION="0.0.1-dev"
+NAME="$0"
+PRESENTATION="This script is a bash script model."
+USAGE="usage:  ${0} [options [=value]]  <arguments>"
+
+# library dir
+BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+# usage ()
+usage () {
+    echo "## ${NAME} - ${VERSION} ##"
+    echo "${PRESENTATION}"
+    echo 
+    echo "${USAGE}"
+    echo 
+}
+# error ( str='' )
+error () {
+    [ $# -ne 0 ] && echo -e ">> $*\n";
+    usage; exit 1;
+}
+#######################################################################
+# arguments
+
+if [ "$1" == '-h' ]||[ "$1" == '--help' ]||[ "$1" == 'help' ]; then error; fi
+
+#######################################################################
+
+echo 'YO'
+
+
+
+
+
+
+
+exit 0
+# Endfile
+# vim: autoindent tabstop=4 shiftwidth=4 expandtab softtabstop=4 filetype=sh
