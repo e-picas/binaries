@@ -223,7 +223,7 @@ doCleanUp () {
 
 #### getlongoption ( "$x" )
 ## echoes the name of a long option
-## see http://github.com/atelierspierrot/piwi-bash-library
+## see http://github.com/piwi/bash-library
 getlongoption () {
     local arg="$1"
     if [ -n "$arg" ]; then
@@ -236,7 +236,7 @@ getlongoption () {
 
 #### getlongoptionarg ( "$x" )
 ## echoes the argument of a long option
-## see http://github.com/atelierspierrot/piwi-bash-library
+## see http://github.com/piwi/bash-library
 getlongoptionarg () {
     local arg="$1"
     if [ -n "$arg" ]; then
