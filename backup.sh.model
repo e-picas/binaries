@@ -10,11 +10,11 @@
 #
 
 # this should be defined in `.bashrc`
-[ -z $BACKUPDIR ] && BACKUPDIR="${HOME}/backups";
-[ ! -d $BACKUPDIR ] && mkdir -p "${BACKUPDIR}";
+[ -z "$BACKUPDIR" ] && BACKUPDIR="${HOME}/backups";
+[ ! -d "$BACKUPDIR" ] && mkdir -p "${BACKUPDIR}";
 
 # vars
-_DATE=$(date +%d-%m-%Y)
+_DATE=$(date '+%d-%m-%Y')
 _LOG_FILE="${BACKUPDIR}/history"
 
 # database dump
@@ -34,7 +34,7 @@ cd "${BACKUPDIR}/|SERVER|" && wget -nvc -a $_LOG_FILE -t 0 -r "ftp://|USER|:|PAS
 cd "${BACKUPDIR}/|SERVER|" && wget -nv -a $_LOG_FILE http://sql.free.fr/backup.php --post-data="login=|USER|&password=|PASS|&check=1&all=1" -O "${BACKUPDIR}/|USER|-${_DATE}.sql.gz";
 
 # full cloning
-[ ! -d $BACKUPDIR/|SERVER|-clone ] && mkdir -p "${BACKUPDIR}/|SERVER|-clone";
+[ ! -d "$BACKUPDIR/|SERVER|-clone" ] && mkdir -p "${BACKUPDIR}/|SERVER|-clone";
 rsync -avrlzh |USER|@|SERVER|:~/|DIR| "${BACKUPDIR}/|SERVER|-clone/" &> $_LOG_FILE;
 
 # in case of a local backup on the server: synch backups locally and remove them from the server

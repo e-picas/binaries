@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# synch-ssh-root.sh
+# add-bom.sh
 # by @pierowbmstr (me at e-piwi dot fr)
 # <http://github.com/piwi/binaires.git>
 # (personal) file licensed under CC BY-NC-SA 4.0 <http://creativecommons.org/licenses/by-nc-sa/4.0/>
@@ -29,7 +29,6 @@ processOneFile () {
 }
 
 if [ $# -eq 0 ]; then
-    echo "> missing arg!"
     usage
     exit 1
 fi

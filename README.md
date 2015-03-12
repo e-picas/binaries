@@ -17,7 +17,7 @@ Create the clone and symlink all binaries in current user's `bin/`:
 
 ----
 
-Author: Pierre Cassat - @pierowbmstr (me at e-piwi dot fr)
+Author: Pierre Cassat - @piwi (me at e-piwi dot fr)
 
 Original sources: <http://github.com/piwi/binaries.git>
 
