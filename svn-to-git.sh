@@ -1,8 +1,8 @@
 #!/bin/bash
 #
 # svn-to-git.sh
-# by @pierowbmstr (me at e-piwi dot fr)
-# <http://github.com/piwi/binaires.git>
+# by @picas (me at picas dot fr)
+# <http://github.com/e-picas/binaries.git>
 # (personal) file licensed under CC BY-NC-SA 4.0 <http://creativecommons.org/licenses/by-nc-sa/4.0/>
 #
 # A SVN to GIT utility using internal `git-svn`, retrieving *branches* and *tags* and
@@ -10,7 +10,7 @@
 # 
 # For the original `git-svn` manual, see <http://git-scm.com/docs/git-svn>.
 #
-# See <https://github.com/piwi/binaries/tree/svn-to-git-work> for process info
+# See <https://github.com/e-picas/binaries/tree/svn-to-git-work> for process info
 #
 
 # Usage:

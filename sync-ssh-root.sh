@@ -1,14 +1,14 @@
 #!/bin/bash
 #
 # synch-ssh-root.sh
-# by @pierowbmstr (me at e-piwi dot fr)
-# <http://github.com/piwi/binaires.git>
+# by @picas (me at picas dot fr)
+# <http://github.com/e-picas/binaries.git>
 # (personal) file licensed under CC BY-NC-SA 4.0 <http://creativecommons.org/licenses/by-nc-sa/4.0/>
 #
 # Synchronize an SSH config between a user and root on a machine
 #
 
-_usrname="${1:-piwi}"
+_usrname="${1:-picas}"
 ROOT_SSHDIR=/root/.ssh/
 USER_SSHDIR=/home/${_usrname}/.ssh/
 

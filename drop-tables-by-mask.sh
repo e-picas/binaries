@@ -1,8 +1,8 @@
 #!/bin/bash
 #
 # drop-tables-by-mask.sh
-# by @pierowbmstr (me at e-piwi dot fr)
-# <http://github.com/piwi/binaires.git>
+# by @picas (me at picas dot fr)
+# <http://github.com/e-picas/binaries.git>
 # (personal) file licensed under CC BY-NC-SA 4.0 <http://creativecommons.org/licenses/by-nc-sa/4.0/>
 #
 # Drop all tables matching given mask from a MySQL DB

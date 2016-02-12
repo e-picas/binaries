@@ -1,8 +1,8 @@
 #!/bin/bash
 #
 # cleanup.sh
-# by @pierowbmstr (me at e-piwi dot fr)
-# <http://github.com/piwi/binaires.git>
+# by @picas (me at picas dot fr)
+# <http://github.com/e-picas/binaries.git>
 # (personal) file licensed under CC BY-NC-SA 4.0 <http://creativecommons.org/licenses/by-nc-sa/4.0/>
 #
 # A simple shell utility to fix UNIX rights on files, directories, secret files and binaries
@@ -223,7 +223,7 @@ doCleanUp () {
 
 #### getlongoption ( "$x" )
 ## echoes the name of a long option
-## see http://github.com/piwi/bash-library
+## see http://github.com/e-picas/bash-library
 getlongoption () {
     local arg="$1"
     if [ -n "$arg" ]; then
@@ -236,7 +236,7 @@ getlongoption () {
 
 #### getlongoptionarg ( "$x" )
 ## echoes the argument of a long option
-## see http://github.com/piwi/bash-library
+## see http://github.com/e-picas/bash-library
 getlongoptionarg () {
     local arg="$1"
     if [ -n "$arg" ]; then
