@@ -1,3 +1,6 @@
 [submodule "modules/bash-utils"]
 	path = modules/bash-utils
 	url = https://e-picas@gitlab.com/e-picas/bash-utils.git
+[submodule "modules/markdown-extended"]
+	path = modules/markdown-extended
+	url = https://github.com/e-picas/markdown-extended.git
