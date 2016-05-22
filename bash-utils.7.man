@@ -1,0 +1,1 @@
+modules/bash-utils/man/bash-utils.7.man

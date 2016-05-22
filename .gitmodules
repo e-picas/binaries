@@ -1,0 +1,3 @@
+[submodule "modules/bash-utils"]
+	path = modules/bash-utils
+	url = https://e-picas@gitlab.com/e-picas/bash-utils.git
