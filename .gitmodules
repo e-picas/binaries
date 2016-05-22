@@ -4,3 +4,6 @@
 [submodule "modules/markdown-extended"]
 	path = modules/markdown-extended
 	url = https://github.com/e-picas/markdown-extended.git
+[submodule "modules/ftpsync"]
+	path = modules/ftpsync
+	url = git://git.savannah.gnu.org/ftpsync.git
