@@ -1,0 +1,1 @@
+modules/atelierspierrot/console/dir-cleaner.sh

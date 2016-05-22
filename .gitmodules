@@ -7,3 +7,6 @@
 [submodule "modules/ftpsync"]
 	path = modules/ftpsync
 	url = git://git.savannah.gnu.org/ftpsync.git
+[submodule "modules/atelierspierrot"]
+	path = modules/atelierspierrot
+	url = https://github.com/atelierspierrot/atelierspierrot.git
