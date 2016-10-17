@@ -10,3 +10,9 @@
 [submodule "modules/atelierspierrot"]
 	path = modules/atelierspierrot
 	url = https://github.com/atelierspierrot/atelierspierrot.git
+[submodule "modules/git-changelog"]
+	path = modules/git-changelog
+	url = https://github.com/e-picas/git-changelog.git
+[submodule "modules/generate-salt"]
+	path = modules/generate-salt
+	url = https://github.com/e-picas/generate-salt.git

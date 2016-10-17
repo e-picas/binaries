@@ -1,1 +1,1 @@
-modules/atelierspierrot/console/git-changelog.sh
+modules/git-changelog/git-changelog.sh
