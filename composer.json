@@ -1,5 +1,6 @@
 {
     "name": "picas/bin",
+    "description": "personal PHP binaries dependencies.",
     "authors": [{ "name": "picas", "email": "me@picas.fr" }],
     "require": {
         "php": ">=5.3.2",
@@ -17,10 +18,13 @@
         "ext-json": "*",
         "ext-libxml": "*",
         "ext-mbstring": "*",
+        "ext-mcrypt": "*",
         "ext-mysql": "*",
         "ext-mysqli": "*",
         "ext-openssl": "*",
         "ext-pcre": "*",
+        "ext-pgsql": "*",
+        "ext-pcntl": "*",
         "ext-Phar": "*",
         "ext-posix": "*",
         "ext-soap": "*",
@@ -32,24 +36,25 @@
     "require-dev": {
         "composer/composer": "@stable",
         "sami/sami": "@stable",
-		"phpunit/phpunit": "@stable",
-		"phpunit/php-invoker": "*",
-		"phpunit/dbunit": "*",
-		"phpmd/phpmd" : "@stable",
-		"sebastian/phpcpd": "@stable",
-		"phpmetrics/phpmetrics": "@stable",
-		"phploc/phploc": "@stable",
-		"pdepend/pdepend" : "@stable",
-		"squizlabs/php_codesniffer": "@stable",
+        "phpunit/phpunit": "@stable",
+        "phpunit/php-invoker": "*",
+        "phpunit/dbunit": "*",
+        "phpspec/phpspec": "@stable",
+        "phpmd/phpmd": "@stable",
+        "sebastian/phpcpd": "@stable",
+        "phpmetrics/phpmetrics": "@stable",
+        "phploc/phploc": "@stable",
+        "pdepend/pdepend": "@stable",
+        "squizlabs/php_codesniffer": "@stable",
         "fabpot/php-cs-fixer": "@stable"
     },
-	"repositories": [
-		{ "type": "pear", "url": "http://pear.php.net" }
+    "repositories": [
+        { "type": "pear", "url": "http://pear.php.net" }
     ],
     "config": {
-		"use-include-path": true,
-		"store-auths": true,
-		"discard-changes": "stash",
+        "use-include-path": true,
+        "store-auths": true,
+        "discard-changes": "stash",
         "secure-http": false,
         "bin-dir": "."
     }

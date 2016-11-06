@@ -34,3 +34,14 @@ nbproject
 *.swp
 *.zip
 *.vi
+
+# composer deps
+vendor/*
+composer
+composer.lock
+dbunit
+jsonlint
+pdepend
+php*
+sami.php
+validate-json
