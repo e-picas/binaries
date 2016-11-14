@@ -1,15 +1,29 @@
 #!/bin/bash
+#
+# bash script model
+#
+set -e
 
 #######################################################################
 # script infos
 VERSION="0.0.1-dev"
 NAME="$0"
 PRESENTATION="This script is a bash script model."
-USAGE="usage:  ${0} [options [=value]]  <arguments>"
+USAGE="usage:  $0 [options [=value]]  <arguments>
+    i.e.  $0 test";
 
-# library dir
-BASEDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
+# get_absolute_path()
+get_absolute_path() {
+    local cwd="$(pwd)"
+    local path="$1"
+    while [ -n "$path" ]; do
+        cd "${path%/*}" 2>/dev/null;
+        local name="${path##*/}"
+        path="$($(type -p greadlink readlink | head -1) "$name" || true)"
+    done
+    pwd
+    cd "$cwd"
+}
 # usage ()
 usage () {
     echo "## ${NAME} - ${VERSION} ##"
@@ -20,13 +34,25 @@ usage () {
 }
 # error ( str='' )
 error () {
-    [ $# -ne 0 ] && echo -e ">> $*\n";
-    usage; exit 1;
+    {   echo "> $*"
+        echo '---'
+        usage
+    } >&2
+    exit 1
 }
+
 #######################################################################
+
+# library dir
+BASEDIR="$(get_absolute_path "${BASH_SOURCE[0]}")"
+
 # arguments
 
-if [ "$1" == '-h' ]||[ "$1" == '--help' ]||[ "$1" == 'help' ]; then error; fi
+# -h or --help : usage
+if [[ "$1" =~ ^--?h(elp)?$ ]]; then
+    usage
+    exit 0
+fi
 
 #######################################################################
 
@@ -37,7 +63,4 @@ echo 'YO'
 
 
 
-
-exit 0
-# Endfile
 # vim: autoindent tabstop=4 shiftwidth=4 expandtab softtabstop=4 filetype=sh
