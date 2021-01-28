@@ -64,9 +64,9 @@ EOT
 export SCRIPT_VERSION SCRIPT_LICENSE SCRIPT_NAME SCRIPT_PRESENTATION SCRIPT_USAGE_SHORT SCRIPT_USAGE
 
 #######################################################################
-## [man] Library of functions to call after
+## [man] Library of functions you can use after declaration
 
-# get_help () : display help string
+## [man][fct] get_help () : display help string
 get_help () {
     cat <<EOT
 --- [${SCRIPT_NAME} - v. ${SCRIPT_VERSION}]
@@ -80,7 +80,7 @@ EOT
 }
 export -f get_help
 
-# get_version () : display version string
+## [man][fct] get_version () : display version string
 get_version () {
     if [ $VERBOSE -lt 0 ]
     then echo "${SCRIPT_VERSION}"
@@ -93,7 +93,7 @@ EOT
 }
 export -f get_version
 
-# get_manual () : display documentation (see the bottom of the script)
+## [man][fct] get_manual () : display documentation (see the bottom of the script)
 get_manual() {
     if $DEVDEBUG
     then
@@ -103,7 +103,7 @@ get_manual() {
 ---
 script path: $0
 
-manual extract (matching '[man]') with line number: #@!
+manual extract (matching '[man]' / excluding '#@!') with line number:
 
 $manlines
 
@@ -117,7 +117,7 @@ EOT
 }
 export -f get_manual
 
-# write_log ( <type> <message> ) : add a line to the logs
+## [man][fct] write_log ( <type> <message> ) : add a line to the logs
 write_log() {
     [ $# -lt 2 ] && dev_error_missing_argument "usage: ${FUNCNAME[0]} <type> <message>";
     local type="$1"
@@ -128,7 +128,7 @@ write_log() {
 export -f write_log
 export LOGFILE
 
-# throw_error ( str='' ) : user error manager
+## [man][fct] throw_error ( str='' ) : user error manager
 throw_error () {
     local status=$?
     SCRIPT_STATUS=$((SCRIPT_STATUS + 1))
@@ -146,7 +146,7 @@ EOT
 export -f throw_error
 export SCRIPT_STATUS
 
-# dev_error ( str='' ) : development error manager
+## [man][fct] dev_error ( str='' ) : development error manager
 dev_error () {
     local status=$?
     [ $SCRIPT_STATUS -eq 0 ] \
@@ -180,7 +180,7 @@ export SCRIPT_STATUS
 #   kill (KILL)
 trap 'dev_error $?' ERR
 
-# get_backtrace () : print a stack trace of current run
+## [man][fct] get_backtrace () : print a stack trace of current run
 # https://stackoverflow.com/questions/25492953/bash-how-to-get-the-call-chain-on-errors
 get_backtrace () {
     local deptn=${#FUNCNAME[@]}
@@ -198,7 +198,7 @@ export -f get_backtrace
 dev_error_missing_argument() { dev_error "missing argument > $*"; }
 export -f dev_error_missing_argument
 
-# verbose_echo ( str ) : echo info if VERBOSE enabled
+## [man][fct] verbose_echo ( str ) : echo info if VERBOSE enabled
 verbose_echo () {
     [ $# -eq 0 ] && dev_error_missing_argument "usage: ${FUNCNAME[0]} <str>";
     [ $VERBOSE -gt 0 ] && echo "[INFO] > $*" || return 0;
@@ -206,7 +206,7 @@ verbose_echo () {
 export -f verbose_echo
 export VERBOSE
 
-# get_absolute_path ( path ) : get a 'real' path
+## [man][fct] get_absolute_path ( path ) : get a 'real' path
 get_absolute_path() {
     [ $# -eq 0 ] && dev_error_missing_argument "usage: ${FUNCNAME[0]} <path>";
     local cwd="$(pwd)"
@@ -221,7 +221,7 @@ get_absolute_path() {
 }
 export -f get_absolute_path
 
-# debug () : environment vars debugging
+## [man][fct] debug () : environment vars debugging
 debug() {
     cat <<EOT
 [DEV] > DEBUG
@@ -288,7 +288,7 @@ echo '-- end of script'
 exit 0
 
 #######################################################################
-## [man] Script ends here - anything below is documentation and not executed
+## [man] Script ends here - anything below is documentation and not executed #@!
 #@#
 # Simple Bash Model
 # ====
@@ -297,6 +297,13 @@ exit 0
 # 
 # ## USAGE
 # 
+# As usual when coding, the source code itself may represent the base documentation.
+# Functions, variables and constants may be easy to understand and you should
+# apply these rules when coding yourself.
+#
+# If you have any interrogation about Bash, you may refer to the "Bash scripting guide"
+# available online at <https://tldp.org/LDP/abs/html/>.
+#
 # ### Create your copy
 # 
 # To get a copy of the template, you can download it running
