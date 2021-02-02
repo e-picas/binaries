@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# This is a (simple) Bash script model
+# This is a (simple) Bash script model using the 'library-picas.bash'
 # 
 # Some '[man]' strings are present in the comments to identify #@!
 # what to do to turn this template to your own script.
@@ -24,6 +24,8 @@ LOGFILE="$0.log"
 
 ## [man] Script infos
 # the script name
+SCRIPT_PATH="$0"
+# the script name
 SCRIPT_NAME="$(basename $0)"
 # the version number - you must increase it and follow the semantic versioning standards <https://semver.org/>
 SCRIPT_VERSION="0.0.1-dev"
@@ -37,20 +39,26 @@ EOT
 );
 # an information displayed with the version number: authoring, licensing etc
 SCRIPT_LICENSE=$(cat <<EOT
-$LD_SCRIPT_LICENSE
+  Authored by me...
+  Released under a license...
 EOT
 );
 # a quick usage string, complete but concise
 SCRIPT_USAGE_SHORT=$(cat <<EOT
-$LD_SCRIPT_USAGE_SHORT
+$LIB_SCRIPT_USAGE_SHORT
 EOT
 );
 # the long helping string explaining how to use the script
 SCRIPT_USAGE=$(cat <<EOT
-$LD_SCRIPT_USAGE
+$SCRIPT_USAGE_SHORT
+
+options:
+%_options_list_%
+
+${LIB_OPTIONS_USAGE}
+For more information about the library in use, run: 'library-picas.bash --help'
 EOT
 );
-export SCRIPT_USAGE
 
 #######################################################################
 ## [man] System settings
@@ -62,8 +70,8 @@ export SCRIPT_USAGE
 #   interrupt (SIGINT)
 #   terminate (SIGTERM)
 #   kill (KILL)
-trap 'error_dev $?' ERR
-trap 'error_interrupt $?' SIGINT
+trap 'error_trapped ERR $?' ERR
+trap 'error_trapped SIGINT $?' SIGINT
 
 #######################################################################
 ## [man] Arguments, parameters & options
@@ -71,58 +79,63 @@ trap 'error_interrupt $?' SIGINT
 # if arguments are required
 [ $# -eq 0 ] && error_throw 'arguments are required';
 
-# # arguments
-# ARGS_ORIG="$*"
+# call this to let the library handle its default arguments
+treat_arguments $*
+
+# # custom arguments handler
 # while [ $# -gt 0 ]; do
 #     ARG_PARAM="$(cut -d'=' -f2 <<< "$1")"
 #     case "$1" in
-# #_opts_#
 # ## this is used to generate a list of available options
+# #_opts_#
 #         # user options...
-#         --option=*) VAR="$ARG_PARAM" ;; # to do what ?
+#         -o=*|--option=*) VAR="$ARG_PARAM" ;; # to do what ?
 
 #         # you should NOT change below
 #         -h|--help) get_help ;; # display help string
 #         -V|--version) get_version ;; # display version string
 #         -v|--verbose) VERBOSE=$((VERBOSE + 1)) ;; # increase verbosity
 #         -q|--quiet) VERBOSE=$((VERBOSE - 1)) ;; # decrease verbosity
-#         --dry-run|--check) DRYRUN=true ;; # enable "dry-run" mode (nothing is actually done)
-
-#         # these are mostly for the library
-#         --manual) get_manual ;; # display manual
-#         --options) get_options_list ;; # display options list
-#         # for development...
-#         -x|--debug) DEVDEBUG=true ;; # enable debug mode
+#         -x|--dry-run|--check) DRYRUN=true ;; # enable "dry-run" mode (nothing is actually done)
 #         -l|--log) LOGGING=true ;; # enable logging
-#         --log-file=*) LOGFILE="$ARG_PARAM" ;; # set logfile path
+#         -L=*|--log-file=*) LOGFILE="$ARG_PARAM" ;; # set logfile path
+
+#         # you probably DON'T want to use these...
+#         --manual) # display manual
+#             $DEVDEBUG && get_manual_developer || get_manual ;; 
+#         --debug) DEVDEBUG=true ;; # enable debug mode
 # #_opts_#
 #         -*) error_throw "unknown option '$1'" ;;
 #         *) break ;;
 #     esac
 #     shift
 # done
-# export VERBOSE DRYRUN DEVDEBUG SCRIPT_STATUS LOGGING LOGFILE
 
 #######################################################################
 ## [man] Let's go for scripting ;)
-log_write 'info' "starting run with params: $ARGS_ORIG"
 
-      # throws a classic 'usage' error
-      # error_throw 'test error...'
-      
-      # throws a development error with a stack trace
-      # error_dev 'test dev error...'
-      
-      # test error trapping
-      # cmd_not_found
-      
-      # this will only write 'test verbosity...' if the '--verbose' option is used
-      # echo_verbose 'test verbosity...'
-      
-      # write a string to the logs
-      # log_write info 'test log'
+# this will write all calls to logfile
+log_write 'info' "starting run with params: $CMD_ARGS"
 
+# throws a classic 'usage' error
+# error_throw 'test error...'
+
+# throws a development error with a stack trace
+# error_dev 'test dev error...'
+
+# test error trapping
+# cmd_not_found
+
+# this will only write 'test verbosity...' if the '--verbose' option is used
+# echo_verbose 'test verbosity...'
+
+# write a string to the logs
+# log_write info 'test log'
+
+# test trapping a usre interrupt (press Ctrl+C while sleeping)
 # sleep 10
+
+# echo "$1"
 
 $DEVDEBUG && debug;
 echo '-- end of script'
@@ -130,4 +143,9 @@ exit 0
 
 #######################################################################
 ## [man] Script ends here - anything below is documentation and not executed #@!
+#_doc_#
+#
+# WRITE MANUAL HERE
+#
+#_doc_#
 # vim: autoindent tabstop=4 shiftwidth=4 expandtab softtabstop=4 filetype=sh

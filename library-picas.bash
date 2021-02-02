@@ -5,83 +5,117 @@
 # Author: Picas (<me[at]picas.fr>) - 2021
 # 
 # This is a (simple) library for Bash scripting
-# See the bottom of the file for a longer documentation.
+# See the bottom of the file for a longer documentation
 # Released into the public domain (see the bottom of the file for more info)
-# by Picas <me[at]picas.fr>
+# By Picas <me[at]picas.fr>
 #
-set -e
-set -o errtrace
 
 #######################################################################
-## [man] Default flags refixed by LB_ for 'Library Bash'_
+## [man] Bash options
+# abort script at first command with a non-zero status (set -e)
+set -o errexit
+# trap on ERR are inherited by shell functions (set -E)
+set -o errtrace
+# do not mask pipeline's errors
+set -o pipefail
+# trap on DEBUG and RETURN are inherited by shell functions (set -T)
+set -o functrace
+# throw error on unset variable usage (set -u)
+set -o nounset
+# export all defined variables (set -a)
+# set -o allexport
+
+#######################################################################
+## [man] Default flags you can overwrite in your child script
 export VERBOSE=0
 export DRYRUN=false
 export DEVDEBUG=false
 export LOGGING=false
 export LOGFILE="$BASH_SOURCE.log"
-export SCRIPT_STATUS=0
 
-## [man] Script infos
+## [man] Default flags to NOT overwrite
+export SCRIPT_STATUS=0
+export LIB_DIRECT=false
+readonly CMD_ARGS="$*"
+
+## [man] Library infos prefixed by LIB_
 # the path of the library
-export LB_SCRIPT_PATH="$BASH_SOURCE"
+readonly LIB_SCRIPT_PATH="$BASH_SOURCE"
 # the filename of that path
-export LB_SCRIPT_NAME="$(basename $BASH_SOURCE)"
+readonly LIB_SCRIPT_NAME="$(basename $BASH_SOURCE)"
 # the version number - you must increase it and follow the semantic versioning standards <https://semver.org/>
-export LB_SCRIPT_VERSION="0.0.1-dev"
+readonly LIB_SCRIPT_VERSION="0.0.1-dev"
 # a short presentation about the purpose of the script
-export LB_SCRIPT_PRESENTATION=$(cat <<EOT
+readonly LIB_SCRIPT_PRESENTATION=$(cat <<EOT
 This software is a (simple) library for Bash scripting (see <https://tldp.org/LDP/abs/html/>).
 You can use it as a library of functions to help you for your own scripts.
 EOT
 );
 # an information displayed with the version number: authoring, licensing etc
-export LB_SCRIPT_LICENSE=$(cat <<EOT
+readonly LIB_SCRIPT_LICENSE=$(cat <<EOT
   Authored by Picas (<me[at]picas.fr>)
   Released UNLICENSEd into the public domain
 EOT
 );
 # a quick usage string, complete but concise
-export LB_SCRIPT_USAGE_SHORT=$(cat <<EOT
-usage:  $SCRIPT_NAME [-v|-x] [--option[=arg]] <parameters>
-        $SCRIPT_NAME -h | --help
+readonly LIB_SCRIPT_USAGE_SHORT=$(cat <<EOT
+usage:  $0 [-v|-x] [--option[=arg]] <parameters>
+        $0 --help
 EOT
 );
-# the long helping string explaining how to use the script
-export LB_SCRIPT_USAGE=$(cat <<EOT
-$LB_SCRIPT_USAGE_SHORT
-
-options:
-        --option[=arg]      : to do what ?
-        -v|--verbose        : increase verbosity
-        -q|--quiet          : decrease verbosity
-        -l|--log            : enable logging
-        --dry-run|--check   : enable "dry-run" mode (nothing is actually done)
-
-special options:
-        --help              : display help string
-        --version           : display version string
-        --manual            : display long documentation string
-        --debug             : enable debug mode
-
+# an information about how to write script options & arguments
+readonly LIB_OPTIONS_USAGE=$(cat <<EOT
 Options MUST be written BEFORE parameters and are treated in command line order.
 Options arguments MUST be written after an equal sign: '--option=argument'.
 Options MUST NOT be grouped: '-v -x'.
 EOT
 );
-# export SCRIPT_VERSION
-# export SCRIPT_LICENSE
-# export SCRIPT_NAME
-# export SCRIPT_PRESENTATION
-# export SCRIPT_USAGE_SHORT
-# export SCRIPT_USAGE
+# the long helping string explaining how to use the script
+readonly LIB_SCRIPT_USAGE=$(cat <<EOT
+$LIB_SCRIPT_USAGE_SHORT
+
+options:
+%_options_list_%
+
+${LIB_OPTIONS_USAGE}
+EOT
+);
+export SCRIPT_PATH="$0"
+export SCRIPT_NAME="$(basename $0)"
+export SCRIPT_VERSION
+export SCRIPT_LICENSE
+export SCRIPT_PRESENTATION
+export SCRIPT_USAGE_SHORT
+export SCRIPT_USAGE
 
 #######################################################################
-## [man] Library of functions you can use after declaration
+## [man] Library of functions for output script's information
+
+## [man][fct] get_signature () : display name & version
+get_signature () {
+    $LIB_DIRECT \
+        && echo "${LIB_SCRIPT_NAME} - v. ${LIB_SCRIPT_VERSION}" \
+        || echo "${SCRIPT_NAME} - v. ${SCRIPT_VERSION}" \
+    ;
+}
+export -f get_signature
+
+## [man][fct] get_usage () : display usage string
+get_usage () {
+    cat <<EOT
+${SCRIPT_USAGE_SHORT}
+EOT
+}
+export -f get_usage
 
 ## [man][fct] get_help () : display help string
 get_help () {
-    cat <<EOT
---- [${SCRIPT_NAME} - v. ${SCRIPT_VERSION}]
+    local opts_list="$(get_options_list)"
+    # escape the string for sed - see <https://unix.stackexchange.com/a/60322>
+    opts_list="$(printf '%s\n' "$opts_list" | sed 's,[\/&],\\&,g;s/$/\\/')"
+    opts_list="${opts_list%?}"
+    cat <<EOT | sed -e "s/${MASK_OPTIONS_LIST}/${opts_list}/g"
+--- [$(get_signature)]
 
 ${SCRIPT_PRESENTATION}
 
@@ -91,6 +125,7 @@ EOT
     exit 0
 }
 export -f get_help
+export MASK_OPTIONS_LIST='%_options_list_%'
 
 ## [man][fct] get_version () : display version string
 get_version () {
@@ -105,26 +140,22 @@ EOT
 }
 export -f get_version
 
-
 ## [man][fct] get_manual () : display documentation (see the bottom of the script)
-get_manual() {
-    local filepath="${1:-$LB_SCRIPT_PATH}"
-    if $DEVDEBUG
-    then
-        get_manual_developer
-    else
-        local linenb_end_lib_first=$(grep -n "${TAG_ENDLIB}" $filepath | grep -v 'export ' | head -n1 | cut -d: -f1)
-        cat $filepath | sed "1,${linenb_end_lib_first}d;${linenb_end_lib_first},/${TAG_DOC}/d;/${TAG_DOC}/,\$d" | sed -e 's/^#//' ;
-    fi
+get_manual () {
+    local filepath="${1:-$0}"
+    local linenb_doc_first=$(grep -n "${TAG_DOC}" $filepath | grep -v 'export ' | head -n1 | cut -d: -f1)
+    cat $filepath | sed "1,${linenb_doc_first}d;/${TAG_DOC}/,\$d" | sed -e 's/^#//' ;
     exit 0
 }
 export -f get_manual
 export TAG_DOC='#_doc_#'
-export TAG_ENDLIB='#_end_lib_#'
+
+#######################################################################
+## [man] Library of functions for output script's information for development
 
 ## [man][fct] get_manual_developer () : display lines with a '[man]' mark
 get_manual_developer() {
-    local filepath="${1:-$LB_SCRIPT_PATH}"
+    local filepath="${1:-$0}"
     local manlines=$(grep -n "$TAG_MAN" $filepath | grep -v "$TAG_EXCLUDE");
     cat >&2 <<EOT
 [DEV] > MANUAL
@@ -135,16 +166,9 @@ manual extract (matching '[man]' / excluding '#@!') with line number:
 
 $manlines
 
-existing functions:
-
-$(typeset -F)
-
 ---
-[${SCRIPT_NAME} - v. ${SCRIPT_VERSION}]
+[$(get_signature)]
 EOT
-
-#env | grep -v BASH_FUNC
-
     exit 0
 }
 export -f get_manual_developer
@@ -152,147 +176,72 @@ export TAG_MAN='\[man\]'
 export TAG_EXCLUDE='#@!'
 
 ## [man][fct] get_options_list () : display lines with a '[man]' mark
-get_options_list() {
-    local linenb_end_lib_first=$(grep -n "${TAG_ENDLIB}" $0 | grep -v 'export ' | head -n1 | cut -d: -f1)
-    local opts_lines=$(cat $0 | sed "1,${linenb_end_lib_first}d;${linenb_end_lib_first},/${TAG_OPTS}/d;/${TAG_OPTS}/,\$d" | sed -e 's/^#//' );
+get_options_list () {
+    local filepath="${1:-$0}"
+    local linenb_opts_first=$(grep -n "${TAG_OPTS}" $filepath | grep -v 'export ' | head -n1 | cut -d: -f1)
+    local opts_lines=$(cat $filepath | sed "1,${linenb_opts_first}d;/${TAG_OPTS}/,\$d" | sed -e 's/^#//' );
     local line_opt line_comment
+    local -a option_names=()
+    local -a option_comments=()
+    local line_lgt=0
+    local max_lgt=0
     while read -r line
     do
         if [[ "$line" == '-'* ]]; then
             line_opt=$(echo "$line" | cut -d')' -f1);
             line_comment=$(echo "$line" | grep '#' | cut -d'#' -f2);
-            line_opt="${line_opt//=*/=<arg>}"
-            line_opt="${line_opt//|/, }"
-            echo "    $line_opt    : $line_comment"
+            line_opt="$(echo "$line_opt" | sed -e 's/=\*/=<arg>/g' -e 's/|/, /g')"
+            option_names+=( "$line_opt" )
+            option_comments+=( "$line_comment" )
+            line_lgt="${#line_opt}"
+            [ $line_lgt -gt $max_lgt ] && max_lgt=$line_lgt;
         fi
     done < <(echo "$opts_lines")
+
+    local options_string=''
+    for i in "${!option_names[@]}"; do
+        printf "        %s%$((max_lgt+2-${#option_names[i]}))s:%s\n" "${option_names[i]}" " " "${option_comments[i]}"
+    done
+
     exit 0
 }
 export -f get_options_list
 export TAG_OPTS='#_opts_#'
 
-## [man][fct] log_write ( <type> <message> ) : add a line to the logs
-log_write() {
-    $LOGGING || return 0;
-    [ $# -lt 2 ] && error_dev_missing_argument "usage: ${FUNCNAME[0]} <type> <message>";
-    local type="$1"
-    shift
-    local msg="$*"
-    echo "$(date +'%Y-%m-%d:%H:%M %s') | [$type] $msg" >> $LOGFILE ;
-}
-export -f log_write
-export LOGFILE LOGGING
+## [man][fct] treat_arguments ( $* ) : treat command line arguments
+treat_arguments () {
+    local ARG_PARAM
+    while [ $# -gt 0 ]; do
+        ARG_PARAM="$(cut -d'=' -f2 <<< "$1")"
+        case "$1" in
+#_opts_#
+            # flag options & settings
+            -v|--verbose) VERBOSE=$((VERBOSE + 1)) ;; # increase verbosity
+            -q|--quiet) VERBOSE=$((VERBOSE - 1)) ;; # decrease verbosity
+            -x|--dry-run|--check) DRYRUN=true ;; # enable "dry-run" mode (nothing is actually done)
+            -l|--log) LOGGING=true ;; # enable logging
+            -L=*|--log-file=*) LOGFILE="$ARG_PARAM" ;; # set the logfile path (default is '$0.log')
 
-## [man][fct] error_throw ( str='' ) : user error manager
-error_throw () {
-    local status=$?
-    SCRIPT_STATUS=$((SCRIPT_STATUS + 1))
-    [ $status -ne 0 ] && SCRIPT_STATUS=$((SCRIPT_STATUS + $status))
-    log_write error "$* - exit status $SCRIPT_STATUS";
-    cat >&2 <<EOT
-[ERROR] > $*
----
-${SCRIPT_USAGE_SHORT}
----
-[${SCRIPT_NAME} - v. ${SCRIPT_VERSION}]
-EOT
-    exit $SCRIPT_STATUS
-}
-export -f error_throw
-export SCRIPT_STATUS
+            # library strings
+            --help) get_help ;; # display help string
+            --version) get_version ;; # display version string
+            --manual) get_manual ;; # display long documentation string
 
-## [man][fct] error_dev_output ( str='' ) : development error manager
-error_dev_output () {
-    cat >&2 <<EOT
-[DEV ERROR] > $*
----
-exit status: $SCRIPT_STATUS
-
-stack backtrace:
-$(get_backtrace)
-
----
-[${SCRIPT_NAME} - v. ${SCRIPT_VERSION}]
-EOT
-}
-export -f error_dev_output
-
-## [man][fct] error_dev ( str='' ) : development error manager
-error_dev () {
-    local status=$?
-    [ $SCRIPT_STATUS -eq 0 ] \
-        && SCRIPT_STATUS=127 \
-        || SCRIPT_STATUS=$((SCRIPT_STATUS + 1)) \
-    ;
-    [ $status -ne 0 ] && SCRIPT_STATUS=$((SCRIPT_STATUS + $status))
-    log_write error_dev "$* - exit status $SCRIPT_STATUS";
-    error_dev_output "$*"
-    exit $SCRIPT_STATUS
-}
-export -f error_dev
-export SCRIPT_STATUS
-
-# trapped signals:
-#   errors (ERR)
-#   script exit (EXIT)
-#   interrupt (SIGINT)
-#   terminate (SIGTERM)
-#   kill (KILL)
-
-## [man][fct] error_exit ( str='' ) : user exit error manager
-error_interrupt() {
-    local status=$?
-    [ $SCRIPT_STATUS -eq 0 ] \
-        && SCRIPT_STATUS=127 \
-        || SCRIPT_STATUS=$((SCRIPT_STATUS + 1)) \
-    ;
-    [ $status -ne 0 ] && SCRIPT_STATUS=$((SCRIPT_STATUS + $status))
-    log_write error_signal "[SIGINT] $* - exit status $SCRIPT_STATUS";
-    error_dev_output "USER EXIT (SIGINT) > $*"
-    exit $SCRIPT_STATUS
-}
-export -f error_interrupt
-
-## [man][fct] get_backtrace () : print a stack trace of current run
-# https://stackoverflow.com/questions/25492953/bash-how-to-get-the-call-chain-on-errors
-get_backtrace () {
-    local deptn=${#FUNCNAME[@]}
-    for ((i=$deptn; i>0; i--)); do
-        local func="${FUNCNAME[$i]}"
-        local line="${BASH_LINENO[$((i-1))]}"
-        local src="${BASH_SOURCE[$((i-1))]}"
-        printf '%*s' $i '' # indent
-        echo "at: $func(), $src, line $line"
+            # library development tools
+            --debug) DEVDEBUG=true ;; # enable debug mode
+            --dev-manual) get_manual_developer ;; # display developement manual
+            --dev-functions) typeset -F ;; # display a list of available functions
+            --lib-manual) get_manual $LIB_SCRIPT_PATH ;; # display library developement manual
+            --lib-dev-manual) get_manual_developer $LIB_SCRIPT_PATH ;; # display library list of available functions
+#_opts_#
+            *) break ;;
+        esac
+        shift
     done
+    export VERBOSE DRYRUN DEVDEBUG LOGGING LOGFILE
+    set - $CMD_ARGS
 }
-export -f get_backtrace
-
-# error_dev aliases
-error_dev_missing_argument() { error_dev "missing argument > $*"; }
-export -f error_dev_missing_argument
-
-## [man][fct] echo_verbose ( str ) : echo info if VERBOSE enabled
-echo_verbose () {
-    [ $# -eq 0 ] && error_dev_missing_argument "usage: ${FUNCNAME[0]} <str>";
-    [ $VERBOSE -gt 0 ] && echo "[INFO] > $*" || return 0;
-}
-export -f echo_verbose
-export VERBOSE
-
-## [man][fct] get_absolute_path ( path ) : get a 'real' path
-get_absolute_path() {
-    [ $# -eq 0 ] && error_dev_missing_argument "usage: ${FUNCNAME[0]} <path>";
-    local cwd="$(pwd)"
-    local path="$1"
-    while [ -n "$path" ]; do
-        cd "${path%/*}" 2>/dev/null;
-        local name="${path##*/}"
-        path="$($(type -p greadlink readlink | head -1) "$name" || true)"
-    done
-    pwd
-    cd "$cwd"
-}
-export -f get_absolute_path
+export -f treat_arguments
 
 ## [man][fct] debug () : environment vars debugging
 debug() {
@@ -320,61 +269,159 @@ running:        $(uname -ro)
 uptime:         $(uptime -s)
 
 ---
-[DEBUG - ${SCRIPT_NAME} - v. ${SCRIPT_VERSION}]
+[DEBUG - $(get_signature)]
+[LIB - ${LIB_SCRIPT_NAME} - v. ${LIB_SCRIPT_VERSION}]
 EOT
 }
 export -f debug
 
-#_end_lib_#
 #######################################################################
-## [man] System & global settings
+## [man] Library of functions for errors management
 
-# trap a signal and throw it to 'error_dev ()'
-# trap 'error_dev $?' ERR
-
-
-## [man] Arguments, parameters & options
-
-# # if arguments are required
-# [ $# -eq 0 ] && error_throw 'arguments are required';
-
-# arguments
-treat_arguments() {
-    echo "$*"
-    ARGS_ORIG="$*"
-    while :; do
-        echo "$1"
-        ARG_PARAM="$(cut -d'=' -f2 <<< "$1")"
-        case "$1" in
-    ## this is used to generate a list of available options
-    #_opts_#
-            # you should NOT change below
-            -h|--help) get_help ;; # display help string
-            -V|--version) get_version ;; # display version string
-            -v|--verbose) VERBOSE=$((VERBOSE + 1)) ;; # increase verbosity
-            -q|--quiet) VERBOSE=$((VERBOSE - 1)) ;; # decrease verbosity
-            --dry-run|--check) DRYRUN=true ;; # enable "dry-run" mode (nothing is actually done)
-            # for development...
-            --manual) get_manual ;; # display manual
-            --options) get_options_list ;; # display options list
-            -x|--debug) DEVDEBUG=true ;; # enable debug mode
-            -l|--log) LOGGING=true ;; # enable logging
-            --log-file=*) LOGFILE="$ARG_PARAM" ;; # set logfile path
-    #_opts_#
-            *) break ;;
-        esac
-        shift
-    done
-    export VERBOSE DRYRUN DEVDEBUG SCRIPT_STATUS LOGGING LOGFILE
-    echo "$*"
-    set - $ARGS_ORIG
-    echo "$*"
-    echo 'yo'; exit 2;
+## [man][fct] error_throw ( str='' ) : user error manager
+error_throw () {
+    local status=$?
+    SCRIPT_STATUS=$((SCRIPT_STATUS + 1))
+    [ $status -ne 0 ] && SCRIPT_STATUS=$((SCRIPT_STATUS + $status))
+    log_write error "$* - exit status $SCRIPT_STATUS";
+    cat >&2 <<EOT
+[ERROR] > $*
+---
+${SCRIPT_USAGE_SHORT}
+---
+[$(get_signature)]
+EOT
+    exit $SCRIPT_STATUS
 }
-treat_arguments "$*"
+export -f error_throw
+export SCRIPT_STATUS
+
+## [man][fct] build_error_dev_output ( str='' ) : development error manager
+build_error_dev_output () {
+    cat >&2 <<EOT
+[DEV ERROR] > $*
+---
+exit status: $SCRIPT_STATUS
+
+stack backtrace:
+$(get_backtrace)
+
+---
+[$(get_signature)]
+EOT
+}
+export -f build_error_dev_output
+
+## [man][fct] error_dev ( str='' ) : development error manager
+error_dev () {
+    local status=$?
+    [ $SCRIPT_STATUS -eq 0 ] \
+        && SCRIPT_STATUS=127 \
+        || SCRIPT_STATUS=$((SCRIPT_STATUS + 1)) \
+    ;
+    [ $status -ne 0 ] && SCRIPT_STATUS=$((SCRIPT_STATUS + $status))
+    log_write error_dev "$* - exit status $SCRIPT_STATUS";
+    build_error_dev_output "$*"
+    exit $SCRIPT_STATUS
+}
+export -f error_dev
+export SCRIPT_STATUS
+
+# trapped signals:
+#   errors (ERR)
+#   script exit (EXIT)
+#   interrupt (SIGINT)
+#   terminate (SIGTERM)
+#   kill (KILL)
+# trap 'error_trapped ERR $?' ERR
+# trap 'error_trapped SIGINT $?' SIGINT
+
+## [man][fct] error_trapped ( <type> <status> [message] ) : trapped errors
+error_trapped () {
+    local type="$1"
+    shift
+    local status="$1"
+    shift
+    [ $status -ne 0 ] && SCRIPT_STATUS=$status
+    log_write signal_trapped "[$type] $* - exit status $SCRIPT_STATUS";
+    build_error_dev_output "TRAPPED SIGNAL ($type) > $*"
+    exit $SCRIPT_STATUS
+}
+export -f error_trapped
+
+## [man][fct] get_backtrace () : print a stack trace of current run
+# https://stackoverflow.com/questions/25492953/bash-how-to-get-the-call-chain-on-errors
+get_backtrace () {
+    local deptn=${#FUNCNAME[@]}
+    for ((i=1; i<$deptn; i++)); do
+        local func="${FUNCNAME[$i]}"
+        local line="${BASH_LINENO[$((i-1))]}"
+        local src="${BASH_SOURCE[$((i-1))]}"
+        printf '%*s' $i '' # indent
+        echo "at: $func(), $src, line $line"
+    done
+}
+export -f get_backtrace
+
+# error_dev aliases
+error_dev_missing_argument() { error_dev "missing argument > $*"; }
+export -f error_dev_missing_argument
 
 #######################################################################
-## [man] Script ends here - anything below is documentation and not executed #@!
+## [man] Library of internal functions
+
+## [man][fct] log_write ( <type> <message> ) : add a line to the logs
+log_write() {
+    $LOGGING || return 0;
+    [ $# -lt 2 ] && error_dev_missing_argument "usage: ${FUNCNAME[0]} <type> <message>";
+    local type="$1"
+    shift
+    local msg="$*"
+    echo "$(date +'%Y-%m-%d:%H:%M %s') | [$type] $msg" >> $LOGFILE ;
+}
+export -f log_write
+export LOGFILE LOGGING
+
+## [man][fct] echo_verbose ( str ) : echo info if VERBOSE enabled
+echo_verbose () {
+    [ $# -eq 0 ] && error_dev_missing_argument "usage: ${FUNCNAME[0]} <str>";
+    [ $VERBOSE -gt 0 ] && echo "[INFO] > $*" || return 0;
+}
+export -f echo_verbose
+export VERBOSE
+
+## [man][fct] get_absolute_path ( path ) : get a 'real' path
+get_absolute_path() {
+    [ $# -eq 0 ] && error_dev_missing_argument "usage: ${FUNCNAME[0]} <path>";
+    local cwd="$(pwd)"
+    local path="$1"
+    while [ -n "$path" ]; do
+        cd "${path%/*}" 2>/dev/null;
+        local name="${path##*/}"
+        path="$($(type -p greadlink readlink | head -1) "$name" || true)"
+    done
+    pwd
+    cd "$cwd"
+}
+export -f get_absolute_path
+
+#######################################################################
+## [man] When the library is called directly...
+
+if [ "$0" == "$LIB_SCRIPT_PATH" ]; then
+    LIB_DIRECT=true
+    SCRIPT_VERSION="$LIB_SCRIPT_VERSION"
+    SCRIPT_LICENSE="$LIB_SCRIPT_LICENSE"
+    SCRIPT_PATH="$LIB_SCRIPT_PATH"
+    SCRIPT_NAME="$LIB_SCRIPT_NAME"
+    SCRIPT_PRESENTATION="$LIB_SCRIPT_PRESENTATION"
+    SCRIPT_USAGE_SHORT="$LIB_SCRIPT_USAGE_SHORT"
+    SCRIPT_USAGE="$LIB_SCRIPT_USAGE"
+    [ $# -eq 0 ] && get_help;
+    treat_arguments $*
+fi
+
+#######################################################################
 #_doc_#
 # A Simple Bash Library
 # ====
@@ -394,14 +441,15 @@ treat_arguments "$*"
 # 
 # To get a copy of the template, you can download it running
 # 
-#       wget -O my-script.sh https://raw.githubusercontent.com/e-picas/binaries/master/models/model-simple.bash
+#       wget -O library-picas.bash https://raw.githubusercontent.com/e-picas/binaries/master/library-picas.bash
+#       wget -O my-script.sh https://raw.githubusercontent.com/e-picas/binaries/master/library-picas-template.bash
 #       vi my-script.sh
 #       # ...
 #       bash my-script.sh
 # 
-# ### Template features
+# ### Library & template features
 # 
-# This script intend to be a kind of framework to work with
+# This library intends to be a kind of framework to work with
 # when writing Bash scripts. It is ready to:
 # 
 # -     handle errors printing the error message with some more informations
@@ -436,6 +484,18 @@ treat_arguments "$*"
 #       # write a string to the logs
 #       log_write info 'test log'
 # 
+# ### Library help
+#
+# To get some more help from the library itself, you can begin running:
+#
+#       library-picas.bash --help
+#       # or
+#       library-picas.bash --manual
+#       # or
+#       library-picas.bash --dev-manual
+#       # or
+#       library-picas.bash --dev-functions
+#
 # ### Development tricks
 # 
 # To exit for debugging and keep information of where you are, you can use:
